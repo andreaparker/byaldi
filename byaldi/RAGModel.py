@@ -209,7 +209,7 @@ class RAGMultiModalModel:
         Returns:
             RAGMultiModalModel: Loaded RAG model instance.
         """
-        checkpoint = torch.load(path)
+        checkpoint = torch.load(path, weights_only=True) # addresses the warning about using weights_only=True when loading the model
         instance = cls.from_pretrained(model_name)
         instance.model.load_state_dict(checkpoint['model_state_dict'])
         instance.use_disk_storage = checkpoint.get('use_disk_storage', False)
