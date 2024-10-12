@@ -2,9 +2,9 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from PIL import Image
+import torch
 
 from byaldi.colpali import ColPaliModel
-
 from byaldi.objects import Result
 
 # Optional langchain integration
@@ -37,6 +37,8 @@ class RAGMultiModalModel:
     """
 
     model: Optional[ColPaliModel] = None
+    use_disk_storage: bool = False
+    disk_cache: Any = None
 
     @classmethod
     def from_pretrained(
@@ -107,7 +109,6 @@ class RAGMultiModalModel:
         **kwargs,
     ):
         """Build an index from input documents.
-
         Parameters:
             input_path (Union[str, Path]): Path to the input documents.
             index_name (Optional[str]): The name of the index that will be built.
@@ -117,6 +118,8 @@ class RAGMultiModalModel:
             metadata (Optional[Union[Dict[Union[str, int], Dict[str, Union[str, int]]], List[Dict[str, Union[str, int]]]]]):
                 Metadata for the documents. Can be a dictionary mapping doc_ids to metadata dictionaries,
                 or a list of metadata dictionaries (one for each document).
+            max_image_width (Optional[int]): Maximum width for resizing images.
+            max_image_height (Optional[int]): Maximum height for resizing images.
 
         Returns:
             None
@@ -178,3 +181,75 @@ class RAGMultiModalModel:
 
     def as_langchain_retriever(self, **kwargs: Any):
         return ByaldiLangChainRetriever(model=self, kwargs=kwargs)
+
+    def save_model(self, path: Union[str, Path]):
+        """Save the RAG model state including disk storage settings.
+
+        Parameters:
+            path (Union[str, Path]): Path to save the model state.
+
+        Returns:
+            None
+        """
+        torch.save({
+            'model_state_dict': self.model.state_dict(),
+            'use_disk_storage': self.use_disk_storage,
+            'disk_cache': self.disk_cache,
+        }, path)
+
+
+    @classmethod
+    def load_model(cls, path: Union[str, Path], model_name: str):
+        """Load a RAG model state including disk storage settings.
+
+        Parameters:
+            path (Union[str, Path]): Path to load the model state from.
+            model_name (str): Name of the model to initialize.
+
+        Returns:
+            RAGMultiModalModel: Loaded RAG model instance.
+        """
+        checkpoint = torch.load(path)
+        instance = cls.from_pretrained(model_name)
+        instance.model.load_state_dict(checkpoint['model_state_dict'])
+        instance.use_disk_storage = checkpoint.get('use_disk_storage', False)
+        instance.disk_cache = checkpoint.get('disk_cache', None)
+        return instance
+
+    def enable_disk_storage(self, cache_dir: str = './cache'):
+        """Enable disk-based storage for the RAG model.
+
+        Parameters:
+            cache_dir (str): Directory to use for disk cache.
+
+        Returns:
+            None
+        """
+        from diskcache import Cache
+        self.use_disk_storage = True
+        self.disk_cache = Cache(cache_dir)
+
+    def disable_disk_storage(self):
+        """Disable disk-based storage for the RAG model.
+
+        Returns:
+            None
+        """
+        self.use_disk_storage = False
+        self.disk_cache = None
+
+    def encode_query(self, query: str):
+        """Encode a query using the model's encoder.
+
+        Parameters:
+            query (str): The query to encode.
+
+        Returns:
+            torch.Tensor: The encoded query.
+        """
+        return self.model.encode_query(query)
+
+    # You might want to add this method to your ColPaliModel class if it doesn't exist
+    def encode_query(self, query: str):
+        # Implement query encoding logic here
+        pass
