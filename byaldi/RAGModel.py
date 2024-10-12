@@ -42,21 +42,22 @@ class RAGMultiModalModel:
 
     @classmethod
     def from_pretrained(
+    """Load a ColPali model from a pre-trained checkpoint.
+
+    Parameters:
+        pretrained_model_name_or_path (str): Local path or huggingface model name.
+        device (str): The device to load the model on. Default is "cuda".
+
+    Returns:
+        cls (RAGMultiModalModel): The current instance of RAGMultiModalModel, with the model initialised.
+    """
         cls,
         pretrained_model_name_or_path: Union[str, Path],
         index_root: str = ".byaldi",
         device: str = "cuda",
         verbose: int = 1,
     ):
-        """Load a ColPali model from a pre-trained checkpoint.
-
-        Parameters:
-            pretrained_model_name_or_path (str): Local path or huggingface model name.
-            device (str): The device to load the model on. Default is "cuda".
-
-        Returns:
-            cls (RAGMultiModalModel): The current instance of RAGMultiModalModel, with the model initialised.
-        """
+        """Load a ColPali model from a pre-trained checkpoint."""
         instance = cls()
         instance.model = ColPaliModel.from_pretrained(
             pretrained_model_name_or_path,
@@ -68,13 +69,7 @@ class RAGMultiModalModel:
 
     @classmethod
     def from_index(
-        cls,
-        index_path: Union[str, Path],
-        index_root: str = ".byaldi",
-        device: str = "cuda",
-        verbose: int = 1,
-    ):
-        """Load an Index and the associated ColPali model from an existing document index.
+         """Load an Index and the associated ColPali model from an existing document index.
 
         Parameters:
             index_path (Union[str, Path]): Path to the index.
@@ -83,12 +78,18 @@ class RAGMultiModalModel:
         Returns:
             cls (RAGMultiModalModel): The current instance of RAGMultiModalModel, with the model and index initialised.
         """
+        cls,
+        index_path: Union[str, Path],
+        index_root: str = ".byaldi",
+        device: str = "cuda",
+        verbose: int = 1,
+    ):
+        """Load an Index and the associated ColPali model from an existing document index."""
         instance = cls()
         index_path = Path(index_path)
         instance.model = ColPaliModel.from_index(
             index_path, index_root=index_root, device=device, verbose=verbose
         )
-
         return instance
 
     def index(
@@ -164,16 +165,7 @@ class RAGMultiModalModel:
         k: int = 10,
         return_base64_results: Optional[bool] = None,
     ) -> Union[List[Result], List[List[Result]]]:
-        """Query an index.
-
-        Parameters:
-            query (Union[str, List[str]]): The query or queries to search for.
-            k (int): The number of results to return. Default is 10.
-            return_base64_results (Optional[bool]): Whether to return base64-encoded image results.
-
-        Returns:
-            Union[List[Result], List[List[Result]]]: A list of Result objects or a list of lists of Result objects.
-        """
+        """Query an index."""
         return self.model.search(query, k, return_base64_results)
 
     def get_doc_ids_to_file_names(self):
@@ -183,32 +175,16 @@ class RAGMultiModalModel:
         return ByaldiLangChainRetriever(model=self, kwargs=kwargs)
 
     def save_model(self, path: Union[str, Path]):
-        """Save the RAG model state including disk storage settings.
-
-        Parameters:
-            path (Union[str, Path]): Path to save the model state.
-
-        Returns:
-            None
-        """
+        """Save the RAG model state including disk storage settings."""
         torch.save({
             'model_state_dict': self.model.state_dict(),
             'use_disk_storage': self.use_disk_storage,
             'disk_cache': self.disk_cache,
         }, path)
 
-
     @classmethod
     def load_model(cls, path: Union[str, Path], model_name: str):
-        """Load a RAG model state including disk storage settings.
-
-        Parameters:
-            path (Union[str, Path]): Path to load the model state from.
-            model_name (str): Name of the model to initialize.
-
-        Returns:
-            RAGMultiModalModel: Loaded RAG model instance.
-        """
+        """Load a RAG model state including disk storage settings."""
         checkpoint = torch.load(path, map_location='cpu')
         instance = cls.from_pretrained(model_name)
         instance.model.load_state_dict(checkpoint['model_state_dict'])
@@ -217,39 +193,21 @@ class RAGMultiModalModel:
         return instance
 
     def enable_disk_storage(self, cache_dir: str = './cache'):
-        """Enable disk-based storage for the RAG model.
-
-        Parameters:
-            cache_dir (str): Directory to use for disk cache.
-
-        Returns:
-            None
-        """
+        """Enable disk-based storage for the RAG model."""
         from diskcache import Cache
         self.use_disk_storage = True
         self.disk_cache = Cache(cache_dir)
 
     def disable_disk_storage(self):
-        """Disable disk-based storage for the RAG model.
-
-        Returns:
-            None
-        """
+        """Disable disk-based storage for the RAG model."""
         self.use_disk_storage = False
         self.disk_cache = None
 
     def encode_query(self, query: str):
-        """Encode a query using the model's encoder.
-
-        Parameters:
-            query (str): The query to encode.
-
-        Returns:
-            torch.Tensor: The encoded query.
-        """
+        """Encode a query using the model's encoder."""
         return self.model.encode_query(query)
 
-    # You might want to add this method to your ColPaliModel class if it doesn't exist
-    def encode_query(self, query: str):
-        # Implement query encoding logic here
-        pass
+# You might want to add this method to your ColPaliModel class if it doesn't exist
+def encode_query(self, query: str):
+    # Implement query encoding logic here
+    pass
