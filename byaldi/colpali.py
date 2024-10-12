@@ -159,7 +159,7 @@ class ColPaliModel:
             )
             self.indexed_embeddings = []
             for file in embedding_files:
-                self.indexed_embeddings.extend(torch.load(file))
+                self.indexed_embeddings.extend(torch.load(file, weights_only=True)) #fixes torch load
 
             self.embed_id_to_doc_id = srsly.read_gzip_json(
                 index_path / "embed_id_to_doc_id.json.gz"
