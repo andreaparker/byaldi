@@ -205,9 +205,4 @@ class RAGMultiModalModel:
 
     def encode_query(self, query: str):
         """Encode a query using the model's encoder."""
-        return self.model.encode_query(query)
-
-# You might want to add this method to your ColPaliModel class if it doesn't exist
-def encode_query(self, query: str):
-    # Implement query encoding logic here
-    pass
+        return self.model.encode_query(query
