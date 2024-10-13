@@ -42,15 +42,6 @@ class RAGMultiModalModel:
 
     @classmethod
     def from_pretrained(
-    """Load a ColPali model from a pre-trained checkpoint.
-
-    Parameters:
-        pretrained_model_name_or_path (str): Local path or huggingface model name.
-        device (str): The device to load the model on. Default is "cuda".
-
-    Returns:
-        cls (RAGMultiModalModel): The current instance of RAGMultiModalModel, with the model initialised.
-    """
         cls,
         pretrained_model_name_or_path: Union[str, Path],
         index_root: str = ".byaldi",
