@@ -48,7 +48,7 @@ class RAGMultiModalModel:
         device: str = "cuda",
         verbose: int = 1,
     ):
-        """Load a ColPali model from a pre-trained checkpoint."""
+        #Load a ColPali model from a pre-trained checkpoint.
         instance = cls()
         instance.model = ColPaliModel.from_pretrained(
             pretrained_model_name_or_path,
@@ -60,22 +60,14 @@ class RAGMultiModalModel:
 
     @classmethod
     def from_index(
-         """Load an Index and the associated ColPali model from an existing document index.
-
-        Parameters:
-            index_path (Union[str, Path]): Path to the index.
-            device (str): The device to load the model on. Default is "cuda".
-
-        Returns:
-            cls (RAGMultiModalModel): The current instance of RAGMultiModalModel, with the model and index initialised.
-        """
+         # Load an Index and the associated ColPali model from an existing document index.
         cls,
         index_path: Union[str, Path],
         index_root: str = ".byaldi",
         device: str = "cuda",
         verbose: int = 1,
     ):
-        """Load an Index and the associated ColPali model from an existing document index."""
+        #Load an Index and the associated ColPali model from an existing document index.
         instance = cls()
         index_path = Path(index_path)
         instance.model = ColPaliModel.from_index(
@@ -100,22 +92,7 @@ class RAGMultiModalModel:
         max_image_height: Optional[int] = None,
         **kwargs,
     ):
-        """Build an index from input documents.
-        Parameters:
-            input_path (Union[str, Path]): Path to the input documents.
-            index_name (Optional[str]): The name of the index that will be built.
-            doc_ids (Optional[List[Union[str, int]]]): List of document IDs.
-            store_collection_with_index (bool): Whether to store the collection with the index.
-            overwrite (bool): Whether to overwrite an existing index with the same name.
-            metadata (Optional[Union[Dict[Union[str, int], Dict[str, Union[str, int]]], List[Dict[str, Union[str, int]]]]]):
-                Metadata for the documents. Can be a dictionary mapping doc_ids to metadata dictionaries,
-                or a list of metadata dictionaries (one for each document).
-            max_image_width (Optional[int]): Maximum width for resizing images.
-            max_image_height (Optional[int]): Maximum height for resizing images.
-
-        Returns:
-            None
-        """
+        #Build an index from input documents; returns non
         return self.model.index(
             input_path,
             index_name,
@@ -135,17 +112,7 @@ class RAGMultiModalModel:
         doc_id: Optional[int] = None,
         metadata: Optional[Dict[str, Union[str, int]]] = None,
     ):
-        """Add an item to an existing index.
-
-        Parameters:
-            input_item (Union[str, Path, Image.Image]): The item to add to the index.
-            store_collection_with_index (bool): Whether to store the collection with the index.
-            doc_id (Union[str, int]): The document ID for the item being added.
-            metadata (Optional[Dict[str, Union[str, int]]]): Metadata for the document being added.
-
-        Returns:
-            None
-        """
+        # Add an item to an existing index
         return self.model.add_to_index(
             input_item, store_collection_with_index, doc_id, metadata=metadata
         )
