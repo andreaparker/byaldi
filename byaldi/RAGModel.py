@@ -163,4 +163,4 @@ class RAGMultiModalModel:
 
     def encode_query(self, query: str):
         """Encode a query using the model's encoder."""
-        return self.model.encode_query(query
+        return self.model.encode_query(query)
